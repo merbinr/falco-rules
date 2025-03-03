@@ -16,10 +16,6 @@ permissions:
 jobs:
   push_falco_rules:
     runs-on: ubuntu-latest
-    env:
-      OCI_REGISTRY: ghcr.io
-      OCI_ARTIFACT_NAME: falco-rules
-      OCI_ARTIFACT_VERSION: ${{ github.ref_name }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -27,15 +23,14 @@ jobs:
       - name: Push Falco rules as OCI artifact
         run: |
           set -ex 
-          echo "${env.OCI_REGISTRY},${{ github.repository_owner }},${{ secrets.GITHUB_TOKEN }}" > env_file
+          echo "ghcr.io,${{ github.repository_owner }},${{ secrets.GITHUB_TOKEN }}" > env_file
           docker run --rm --env-file env_file -v $(pwd):/rules falcosecurity/falcoctl:0.11 \
           registry push \
           --config /dev/null \
           --type rulesfile \
-          --version ${env.OCI_ARTIFACT_VERSION} \
-          ${env.OCI_REGISTRY}/${GITHUB_REPOSITORY}:${env.OCI_ARTIFACT_VERSION} \
+          --version ${{ github.ref_name }} \
+          ghcr.io/${GITHUB_REPOSITORY}/falco-rules:${{ github.ref_name }} \
           /rules/rules/falco_rules.yaml
-
 
       - name: cleanup
         if: always()
