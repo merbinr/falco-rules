@@ -27,8 +27,7 @@ jobs:
       - name: Push Falco rules as OCI artifact
         run: |
           set -ex 
-
-          echo $FALCOCTL_REGISTRY_AUTH_BASIC > env_file
+          echo "${OCI_REGISTRY},${{ github.repository_owner }},${{ secrets.GITHUB_TOKEN }}"" > env_file
           docker run --rm --env-file env_file -v $(pwd):/rules falcosecurity/falcoctl:0.11 \
           registry push \
           --config /dev/null \
@@ -36,8 +35,7 @@ jobs:
           --version ${OCI_ARTIFACT_VERSION} \
           ${OCI_REGISTRY}/${GITHUB_REPOSITORY}:${OCI_ARTIFACT_VERSION} \
           /rules/rules/falco_rules.yaml
-        env:
-          FALCOCTL_REGISTRY_AUTH_BASIC: ${OCI_REGISTRY},${{ github.repository_owner }},${{ secrets.GITHUB_TOKEN }}
+
 
       - name: cleanup
         if: always()
