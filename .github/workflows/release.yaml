@@ -26,12 +26,14 @@ jobs:
 
       - name: Push Falco rules as OCI artifact
         run: |
+          set -ex 
+          
           echo $FALCOCTL_REGISTRY_AUTH_BASIC > env_file
           docker run --rm --env-file env_file -v $(pwd):/rules falcosecurity/falcoctl:0.11 \
           registry push \
           --config /dev/null \
           --type rulesfile \
-          --version ${OCI_ARTIFACT_VERSION}
+          --version ${OCI_ARTIFACT_VERSION} \
           ${OCI_REGISTRY}/${GITHUB_REPOSITORY}/${OCI_ARTIFACT_NAME}:${OCI_ARTIFACT_VERSION} \
           /rules/falco_rules.yaml
         env:
